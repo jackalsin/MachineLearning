@@ -63,22 +63,40 @@ Theta2_grad = zeros(size(Theta2));
 %
 
 
+% deal with y
+yTemp = eye(num_labels);
+yTemp = yTemp(y,:);
+y = yTemp;
 
+X = [ones(m, 1), X];
+a1 = X;
+z2 = X * Theta1';
 
+a2 = sigmoid(z2); % 5000 * 10 
+a2 = [ones(m, 1), a2];
 
+z3 = a2 * Theta2';
+a3 = sigmoid(z3);
 
+logisf = (-y) .* log(a3) - (1 .- y) .* log(1 - a3);
 
+newTheta1 = Theta1(:, 2:end);
+newTheta2 = Theta2(:, 2:end);
 
+J = 1 / m * (sum(sum(logisf))) + lambda / (2*m) * (sum(sum(newTheta1 .^2)) + sum(sum(newTheta2.^2)));
 
+delta3 = a3 - y; % 5000 * 26
+delta2 = delta3 * Theta2 .* (a2 .* (1-a2));
 
+triDelta2 = zeros(num_labels, hidden_layer_size + 1);
+triDelta2 += delta3' * a2; 
 
+triDelta1 = zeros(hidden_layer_size + 1, size(X, 2));
+triDelta1 += delta2' * a1;
 
+Theta1_grad = 1/m * triDelta1;
 
-
-
-
-
-
+Theta2_grad = 1/m * triDelta2;
 
 % -------------------------------------------------------------
 
